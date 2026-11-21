@@ -57,6 +57,47 @@ const MODULE_CHILDREN: Partial<Record<string, RouteObject[]>> = {
       ],
     },
   ],
+  customers: [
+    {
+      index: true,
+      lazy: async () => ({
+        Component: (await import('@/features/customers/pages/CustomersListPage')).CustomersListPage,
+      }),
+    },
+    {
+      path: 'new',
+      element: <RequirePermission permission="customers.create" />,
+      children: [
+        {
+          index: true,
+          lazy: async () => ({
+            Component: (await import('@/features/customers/pages/CustomerFormPages'))
+              .CustomerCreatePage,
+          }),
+        },
+      ],
+    },
+    {
+      path: ':customerId',
+      lazy: async () => ({
+        Component: (await import('@/features/customers/pages/CustomerDetailPage'))
+          .CustomerDetailPage,
+      }),
+    },
+    {
+      path: ':customerId/edit',
+      element: <RequirePermission permission="customers.update" />,
+      children: [
+        {
+          index: true,
+          lazy: async () => ({
+            Component: (await import('@/features/customers/pages/CustomerFormPages'))
+              .CustomerEditPage,
+          }),
+        },
+      ],
+    },
+  ],
 };
 
 /** Module routes are generated from NAV_ITEMS and guarded by the module's view permission. */

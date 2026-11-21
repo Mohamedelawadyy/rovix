@@ -11,7 +11,7 @@ import { vehicleKeys, vehiclesApi } from '../api/vehicles-api';
 import { VehicleForm } from '../components/VehicleForm';
 import type { Vehicle } from '../types';
 import { emptyVehicleForm, vehicleToFormValues, type VehiclePayload } from '../vehicle-form-schema';
-import { parseVehicleId } from '../vehicle-id';
+import { parseRouteId } from '@/lib/route-id';
 import type { VehicleDetailLinkState } from './VehicleDetailPage';
 
 const t = ar.vehicles.form;
@@ -68,7 +68,7 @@ export function VehicleCreatePage() {
 
 /** /vehicles/:vehicleId/edit — guarded by `vehicles.update` in the router. */
 export function VehicleEditPage() {
-  const id = parseVehicleId(useParams().vehicleId);
+  const id = parseRouteId(useParams().vehicleId);
   if (id === null) return <NotFoundPage />;
   return <VehicleEdit id={id} />;
 }

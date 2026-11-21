@@ -44,6 +44,9 @@ export default defineConfig(({ mode }) => {
       },
       // Skip CSS processing except the token file, which tokens.test.ts reads to enforce contrast.
       css: { include: [/src[\\/]brand[\\/]tokens\.css/] },
+      // Integration tests render the full app; under a parallel run the first test of a file can
+      // exceed the 5s default while lazy chunks compile.
+      testTimeout: 15_000,
       restoreMocks: true,
       unstubEnvs: true,
     },

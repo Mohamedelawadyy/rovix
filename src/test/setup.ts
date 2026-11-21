@@ -4,8 +4,9 @@ import { afterAll, afterEach, beforeAll } from 'vitest';
 import { server } from './msw/server';
 
 // Integration tests load lazy routes and several mocked requests; under a full parallel run the
-// default 1s for findBy*/waitFor is too tight. Assertions are unchanged, only the wait.
-configure({ asyncUtilTimeout: 3000 });
+// default 1s for findBy*/waitFor is too tight (the first render of a file also compiles its lazy
+// route chunks). Assertions are unchanged, only the wait.
+configure({ asyncUtilTimeout: 5000 });
 
 // jsdom has no <dialog> modal API. Minimal stand-in: real browsers provide focus trapping and
 // the inert background; tests only need open/close state and the close event.

@@ -27,7 +27,7 @@ import {
   vehicleTypeLabels,
 } from '../labels';
 import type { Vehicle } from '../types';
-import { parseVehicleId } from '../vehicle-id';
+import { parseRouteId } from '@/lib/route-id';
 
 const t = ar.vehicles.detail;
 const NA = ar.common.notAvailable;
@@ -45,7 +45,7 @@ function vehicleName(vehicle: Vehicle): string {
 }
 
 export function VehicleDetailPage() {
-  const id = parseVehicleId(useParams().vehicleId);
+  const id = parseRouteId(useParams().vehicleId);
   if (id === null) return <NotFoundPage />;
   return <VehicleDetail id={id} />;
 }
