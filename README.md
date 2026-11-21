@@ -56,9 +56,28 @@ npm run typecheck && npm run lint && npm run format:check && npm test && npm run
 
 ```text
 src/
-  app/        application shell, config (env validation)
-  test/       test setup
+  app/          application shell, config (env validation)
+  assets/brand/ official logo (cropped, never recolored)
+  brand/        tokens.css — single source of truth for brand values (+ contrast tests)
+  components/   shared UI (BrandLogo, ...)
+  lib/          framework-free helpers (color contrast, ...)
+  styles/       global CSS: Cairo font, Tailwind wiring, base styles
+  test/         test setup
 ```
+
+## Design tokens and styling
+
+- All brand values live in [`src/brand/tokens.css`](src/brand/tokens.css): primitives (`--red-*`,
+  `--ink-*`, status) and semantic tokens (`--ui-color-*`, `--ui-radius-*`, ...). Components use
+  semantic tokens only; changing a primitive restyles the whole app.
+- Tailwind v4 utilities are generated **only** from semantic tokens (`bg-primary`, `text-fg`,
+  `text-fg-muted`, `bg-accent`, `bg-danger-subtle`, `rounded-md`, ...). The default Tailwind
+  palette is disabled, so `bg-blue-500`-style classes do not exist.
+- Primary actions use ink (`bg-primary`); the logo red (`accent`) is for identity, active
+  navigation and highlights. Status colors are semantic only.
+- `src/brand/tokens.test.ts` fails the build if a text/background pair drops below WCAG 2.2 AA.
+- Font: Cairo (variable, self-hosted via `@fontsource-variable/cairo`). Default direction is RTL
+  (`<html lang="ar" dir="rtl">`); prefer logical utilities (`ms-*`, `pe-*`, `start-*`).
 
 The full target structure is described in the architecture proposal and will grow feature by
 feature (`src/features/<module>/{api,components,hooks,pages,types}`).

@@ -1,5 +1,6 @@
 /// <reference types="vitest/config" />
 import { fileURLToPath, URL } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 
@@ -12,7 +13,7 @@ export default defineConfig(({ mode }) => {
   const backendUrl = env.BACKEND_PROXY_TARGET || 'http://localhost:8000';
 
   return {
-    plugins: [react()],
+    plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -41,7 +42,8 @@ export default defineConfig(({ mode }) => {
         VITE_APP_NAME: 'Test CDMS',
         VITE_API_BASE_URL: '/api/v1',
       },
-      css: false,
+      // Skip CSS processing except the token file, which tokens.test.ts reads to enforce contrast.
+      css: { include: [/src[\\/]brand[\\/]tokens\.css/] },
       restoreMocks: true,
       unstubEnvs: true,
     },

@@ -1,0 +1,101 @@
+@import '@fontsource-variable/cairo';
+@import 'tailwindcss';
+@import '../brand/tokens.css';
+
+/*
+ * Tailwind utilities are generated only from our semantic tokens.
+ * The default Tailwind palette is removed so off-brand colors (bg-blue-500, ...) cannot be used.
+ */
+@theme inline {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --color-canvas: var(--ui-color-canvas);
+  --color-surface: var(--ui-color-surface);
+  --color-surface-muted: var(--ui-color-surface-muted);
+  --color-sidebar: var(--ui-color-sidebar);
+  --color-sidebar-hover: var(--ui-color-sidebar-hover);
+
+  /* Foreground: text-fg, text-fg-muted, ... */
+  --color-fg: var(--ui-color-text);
+  --color-fg-secondary: var(--ui-color-text-secondary);
+  --color-fg-muted: var(--ui-color-text-muted);
+  --color-fg-inverse: var(--ui-color-text-inverse);
+  --color-fg-on-sidebar: var(--ui-color-text-on-sidebar);
+
+  --color-border: var(--ui-color-border);
+  --color-border-strong: var(--ui-color-border-strong);
+
+  --color-primary: var(--ui-color-primary);
+  --color-primary-hover: var(--ui-color-primary-hover);
+  --color-on-primary: var(--ui-color-on-primary);
+
+  --color-accent: var(--ui-color-accent);
+  --color-accent-hover: var(--ui-color-accent-hover);
+  --color-accent-subtle: var(--ui-color-accent-subtle);
+  --color-on-accent: var(--ui-color-on-accent);
+  --color-accent-on-dark: var(--ui-color-accent-on-dark);
+
+  --color-success: var(--ui-color-success);
+  --color-success-subtle: var(--ui-color-success-subtle);
+  --color-success-strong: var(--ui-color-success-strong);
+  --color-warning: var(--ui-color-warning);
+  --color-warning-subtle: var(--ui-color-warning-subtle);
+  --color-warning-strong: var(--ui-color-warning-strong);
+  --color-danger: var(--ui-color-danger);
+  --color-danger-subtle: var(--ui-color-danger-subtle);
+  --color-danger-strong: var(--ui-color-danger-strong);
+  --color-info: var(--ui-color-info);
+  --color-info-subtle: var(--ui-color-info-subtle);
+  --color-info-strong: var(--ui-color-info-strong);
+
+  --font-sans: var(--ui-font-sans);
+
+  --radius-sm: var(--ui-radius-sm);
+  --radius-md: var(--ui-radius-md);
+  --radius-lg: var(--ui-radius-lg);
+  --radius-full: var(--ui-radius-full);
+
+  --shadow-sm: var(--ui-shadow-sm);
+  --shadow-md: var(--ui-shadow-md);
+  --shadow-lg: var(--ui-shadow-lg);
+}
+
+@layer base {
+  html {
+    font-family: var(--ui-font-sans);
+    color: var(--ui-color-text);
+    background-color: var(--ui-color-canvas);
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Outline (not box-shadow) so it follows each element's radius and never clashes with shadows. */
+  :focus-visible {
+    outline: 2px solid var(--ui-color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--ui-color-accent-subtle);
+    color: var(--ui-color-text);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
