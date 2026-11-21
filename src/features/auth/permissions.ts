@@ -24,3 +24,16 @@ export function canAny(user: AuthUser | null | undefined, permissions: readonly 
 export function canAccessAllBranches(user: AuthUser | null | undefined): boolean {
   return can(user, 'branches.access-all');
 }
+
+/**
+ * Mirrors the backend BranchGuard: all-branch users pass; others need the branch in /auth/me.
+ * Used to decide which transfer actions (receive = destination, cancel = source) to offer.
+ */
+export function canAccessBranch(
+  user: AuthUser | null | undefined,
+  branchId: number | null | undefined,
+): boolean {
+  if (!user || branchId === null || branchId === undefined) return false;
+  if (canAccessAllBranches(user)) return true;
+  return (user.branches ?? []).some((branch) => branch.id === branchId);
+}

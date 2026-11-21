@@ -32,6 +32,13 @@ const MODULE_CHILDREN: Partial<Record<string, RouteObject[]>> = {
       ],
     },
     {
+      path: 'transfers',
+      lazy: async () => ({
+        Component: (await import('@/features/vehicles/pages/VehicleTransfersPage'))
+          .VehicleTransfersPage,
+      }),
+    },
+    {
       path: ':vehicleId',
       lazy: async () => ({
         Component: (await import('@/features/vehicles/pages/VehicleDetailPage')).VehicleDetailPage,

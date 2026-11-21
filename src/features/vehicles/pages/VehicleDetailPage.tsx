@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router';
 import { Card, DetailList, type DetailItem } from '@/components/shared/DetailList';
 import { Alert } from '@/components/ui/Alert';
@@ -13,7 +14,10 @@ import { formatDate, formatNumber } from '@/lib/format';
 import { formatMoney } from '@/lib/money/money';
 import { ar, interpolate } from '@/locales/ar';
 import { vehicleKeys, vehiclesApi } from '../api/vehicles-api';
+import { TransferActions } from '../components/TransferActions';
+import { VehicleActions } from '../components/VehicleActions';
 import { VehicleGallery } from '../components/VehicleGallery';
+import { VehicleImagesManager } from '../components/VehicleImagesManager';
 import { CostsTable, MovementsTable, StatusTimeline } from '../components/VehicleHistorySections';
 import {
   fuelTypeLabels,
@@ -51,6 +55,8 @@ function VehicleDetail({ id }: { id: number }) {
   const location = useLocation();
   const linkState = location.state as VehicleDetailLinkState | null;
   const listSearch = linkState?.listSearch ?? '';
+  // Confirmation after an action on this page (or a save on the form page).
+  const [notice, setNotice] = useState<string | null>(linkState?.notice ?? null);
 
   const vehicleQuery = useQuery({
     queryKey: vehicleKeys.detail(id),
@@ -144,6 +150,7 @@ function VehicleDetail({ id }: { id: number }) {
 
   const specifications = Object.entries(vehicle.specifications ?? {});
   const history = historyQuery.data;
+  const openTransfer = history?.movements.find((movement) => movement.status === 'in_transit');
 
   return (
     <article className="flex flex-col gap-5">
@@ -171,7 +178,22 @@ function VehicleDetail({ id }: { id: number }) {
         </div>
       </header>
 
-      {linkState?.notice ? <Alert tone="success">{linkState.notice}</Alert> : null}
+      <VehicleActions vehicle={vehicle} name={vehicleName(vehicle)} onDone={setNotice} />
+
+      {notice ? <Alert tone="success">{notice}</Alert> : null}
+
+      {openTransfer ? (
+        <div className="flex flex-col gap-3 rounded-lg border border-info-subtle bg-info-subtle p-4 text-sm text-info-strong sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            {interpolate(ar.vehicles.actions.openTransfer, {
+              from: openTransfer.from_branch?.name ?? '—',
+              to: openTransfer.to_branch?.name ?? '—',
+              reference: openTransfer.reference,
+            })}
+          </p>
+          <TransferActions movement={openTransfer} onDone={setNotice} />
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <VehicleGallery images={vehicle.images} name={vehicleName(vehicle)} />
@@ -184,6 +206,10 @@ function VehicleDetail({ id }: { id: number }) {
           </Card>
         </div>
       </div>
+
+      {can('vehicles.update') ? (
+        <VehicleImagesManager vehicle={vehicle} onDone={setNotice} />
+      ) : null}
 
       {vehicle.description ? (
         <Card title={t.sections.description}>

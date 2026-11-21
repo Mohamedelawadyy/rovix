@@ -1,5 +1,13 @@
 import { api, type Paginated } from '@/lib/api';
-import type { IdName, Vehicle, VehicleBrand, VehicleHistory, VehicleModel } from '../types';
+import type {
+  IdName,
+  MovementStatus,
+  Vehicle,
+  VehicleBrand,
+  VehicleHistory,
+  VehicleModel,
+  VehicleMovement,
+} from '../types';
 import type { VehicleListParams } from '../list-params';
 import type { VehiclePayload } from '../vehicle-form-schema';
 
@@ -27,6 +35,54 @@ export const vehiclesApi = {
   /** PUT /vehicles/{id} (vehicles.update + branch). branch_id/purchase_price/status are prohibited. */
   update: (id: number, payload: VehiclePayload) =>
     api.put<Vehicle>(`/vehicles/${String(id)}`, payload),
+
+  /** DELETE /vehicles/{id} — only available / under_maintenance vehicles (409 otherwise). */
+  remove: (id: number) => api.delete<null>(`/vehicles/${String(id)}`),
+
+  /** Manual status change: only available ⇄ under_maintenance (others are workflow-driven). */
+  changeStatus: (id: number, body: { status: 'available' | 'under_maintenance'; reason: string }) =>
+    api.post<Vehicle>(`/vehicles/${String(id)}/status`, body),
+
+  /** POST /vehicles/{id}/transfer — vehicle becomes `transferred` until received or cancelled. */
+  transfer: (id: number, body: { to_branch_id: number; notes: string | null }) =>
+    api.post<VehicleMovement>(`/vehicles/${String(id)}/transfer`, body),
+
+  /** Receiving needs access to the destination branch. */
+  receiveTransfer: (movementId: number) =>
+    api.post<VehicleMovement>(`/vehicle-transfers/${String(movementId)}/receive`),
+
+  /** Cancelling needs access to the source branch. */
+  cancelTransfer: (movementId: number) =>
+    api.post<VehicleMovement>(`/vehicle-transfers/${String(movementId)}/cancel`),
+
+  /** GET /vehicle-transfers — movements touching the user's branches. */
+  transfers: (
+    params: { page: number; status?: MovementStatus | undefined },
+    signal?: AbortSignal,
+  ) =>
+    api.get<Paginated<VehicleMovement>>('/vehicle-transfers', {
+      query: {
+        page: params.page,
+        per_page: 15,
+        sort: '-initiated_at',
+        filter: { status: params.status },
+      },
+      ...(signal ? { signal } : {}),
+    }),
+
+  /** Multipart upload (jpg/jpeg/png/webp ≤ 5 MB). */
+  uploadImage: (id: number, file: File, isPrimary: boolean) => {
+    const form = new FormData();
+    form.append('image', file);
+    form.append('is_primary', isPrimary ? '1' : '0');
+    return api.post<{ id: number; url: string; is_primary: boolean }>(
+      `/vehicles/${String(id)}/images`,
+      form,
+    );
+  },
+
+  deleteImage: (id: number, imageId: number) =>
+    api.delete<null>(`/vehicles/${String(id)}/images/${String(imageId)}`),
 
   /** Active suppliers for the form (needs `suppliers.view`). */
   suppliers: (signal?: AbortSignal) =>
@@ -69,4 +125,6 @@ export const vehicleKeys = {
   models: (brandId: number) => ['vehicle-catalog', 'models', brandId] as const,
   branches: ['branches', 'options'] as const,
   suppliers: ['suppliers', 'options'] as const,
+  transfers: (params: { page: number; status?: string | undefined }) =>
+    ['vehicles', 'transfers', params] as const,
 };
