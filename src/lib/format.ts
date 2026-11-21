@@ -19,3 +19,22 @@ export function formatDate(value: string | null | undefined, locale = DEFAULT_LO
     timeZone: 'UTC',
   }).format(date);
 }
+
+/** ISO timestamp → localized date and time in the business timezone (Africa/Cairo). */
+export function formatDateTime(
+  value: string | null | undefined,
+  locale = DEFAULT_LOCALE,
+  timeZone = 'Africa/Cairo',
+): string {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(`${locale}-u-nu-latn`, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone,
+  }).format(date);
+}

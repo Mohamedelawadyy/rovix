@@ -1,3 +1,4 @@
+import { Link, useLocation } from 'react-router';
 import { Badge } from '@/components/ui/Badge';
 import { formatNumber } from '@/lib/format';
 import { formatMoney } from '@/lib/money/money';
@@ -9,6 +10,7 @@ import {
   vehicleStatusTone,
   vehicleTypeLabels,
 } from '../labels';
+import type { VehicleDetailLinkState } from '../pages/VehicleDetailPage';
 import type { Vehicle } from '../types';
 
 const c = ar.vehicles.columns;
@@ -25,6 +27,9 @@ export function VehiclesTable({
   showCost: boolean;
   busy: boolean;
 }) {
+  const location = useLocation();
+  const linkState: VehicleDetailLinkState = { listSearch: location.search };
+
   return (
     // Wide tables scroll inside their card on small screens; the page itself never scrolls sideways.
     <div className="overflow-x-auto rounded-lg border border-border bg-surface">
@@ -67,10 +72,14 @@ export function VehiclesTable({
                 {vehicle.stock_number}
               </td>
               <td className="px-4 py-3">
-                <div className="font-medium text-fg">
+                <Link
+                  to={`/vehicles/${String(vehicle.id)}`}
+                  state={linkState}
+                  className="font-medium text-fg hover:text-accent hover:underline"
+                >
                   {[vehicle.brand?.name, vehicle.model?.name].filter(Boolean).join(' ')}{' '}
                   <span className="text-fg-muted">{vehicle.year}</span>
-                </div>
+                </Link>
                 <div className="text-xs text-fg-muted">
                   {[vehicle.color, vehicle.vin].filter(Boolean).join(' · ') ||
                     ar.common.notAvailable}

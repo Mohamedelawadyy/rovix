@@ -77,3 +77,60 @@ export interface VehicleModel {
   name: string;
   is_active: boolean;
 }
+
+export const VEHICLE_COST_TYPES = [
+  'transportation',
+  'maintenance',
+  'inspection',
+  'licensing',
+  'registration',
+  'repairs',
+  'other',
+] as const;
+export type VehicleCostType = (typeof VEHICLE_COST_TYPES)[number];
+
+export const MOVEMENT_STATUSES = ['in_transit', 'completed', 'cancelled'] as const;
+export type MovementStatus = (typeof MOVEMENT_STATUSES)[number];
+
+/** Raw VehicleCost model (dates serialize as ISO UTC, amounts as decimal strings). */
+export interface VehicleCost {
+  id: number;
+  cost_type: VehicleCostType;
+  amount: MoneyString;
+  cost_date: string;
+  description: string | null;
+  purchase_order_id: number | null;
+  treasury_transaction_id: number | null;
+}
+
+/** `VehicleMovementResource`. */
+export interface VehicleMovement {
+  id: number;
+  reference: string;
+  vehicle?: { id: number; stock_number: string };
+  from_branch?: IdName;
+  to_branch?: IdName;
+  status: MovementStatus;
+  notes: string | null;
+  initiated_by: number | null;
+  initiated_at: string | null;
+  completed_by: number | null;
+  completed_at: string | null;
+}
+
+export interface VehicleStatusChange {
+  from_status: VehicleStatus | null;
+  to_status: VehicleStatus;
+  reason: string | null;
+  /** Workflow that caused the change (morph alias), e.g. `sales_contract`. */
+  source: { type: string; id: number } | null;
+  changed_by: IdName | null;
+  created_at: string;
+}
+
+/** GET /vehicles/{id}/history. `costs` is null without `vehicles.view-cost`. */
+export interface VehicleHistory {
+  status_history: VehicleStatusChange[];
+  movements: VehicleMovement[];
+  costs: VehicleCost[] | null;
+}

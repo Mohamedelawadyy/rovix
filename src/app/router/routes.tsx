@@ -7,29 +7,37 @@ import { GuestOnly, RequireAuth } from '@/features/auth/components/RouteGuards';
 import { AppLayout } from '@/layouts/app/AppLayout';
 
 /**
- * Module routes are generated from NAV_ITEMS, guarded by the module permission and lazily
- * loaded (one chunk per module). Until a module is built it renders a placeholder; FE-008+
- * replace the lazy import with the real feature page.
+ * Child routes of built modules, keyed by NAV_ITEMS key (paths relative to the module path).
+ * Every page is lazy-loaded. Modules not listed here render a placeholder.
  */
-/** Built module list pages, keyed by NAV_ITEMS key. Others show the placeholder. */
-const MODULE_PAGES: Partial<Record<string, RouteObject['lazy']>> = {
-  vehicles: async () => ({
-    Component: (await import('@/features/vehicles/pages/VehiclesListPage')).VehiclesListPage,
-  }),
+const MODULE_CHILDREN: Partial<Record<string, RouteObject[]>> = {
+  vehicles: [
+    {
+      index: true,
+      lazy: async () => ({
+        Component: (await import('@/features/vehicles/pages/VehiclesListPage')).VehiclesListPage,
+      }),
+    },
+    {
+      path: ':vehicleId',
+      lazy: async () => ({
+        Component: (await import('@/features/vehicles/pages/VehicleDetailPage')).VehicleDetailPage,
+      }),
+    },
+  ],
 };
 
+/** Module routes are generated from NAV_ITEMS and guarded by the module's view permission. */
 const moduleRoutes: RouteObject[] = NAV_ITEMS.map((item) => ({
   path: item.to,
   element: <RequirePermission permission={item.permission} />,
-  children: [
+  children: MODULE_CHILDREN[item.key] ?? [
     {
       index: true,
-      lazy:
-        MODULE_PAGES[item.key] ??
-        (async () => {
-          const { ModulePlaceholderPage } = await import('@/app/pages/ModulePlaceholderPage');
-          return { element: <ModulePlaceholderPage title={item.label} /> };
-        }),
+      lazy: async () => {
+        const { ModulePlaceholderPage } = await import('@/app/pages/ModulePlaceholderPage');
+        return { element: <ModulePlaceholderPage title={item.label} /> };
+      },
     },
   ],
 }));
