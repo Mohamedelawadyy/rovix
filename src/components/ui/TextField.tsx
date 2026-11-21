@@ -1,41 +1,38 @@
-import { type InputHTMLAttributes, useId } from 'react';
+import { type ComponentProps, useId } from 'react';
+import { FieldLabel, FieldMessages } from './field-parts';
+import { fieldDescribedBy } from './field-utils';
 
-export interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> {
+export interface TextFieldProps extends Omit<ComponentProps<'input'>, 'id'> {
   label: string;
   /** Server or client validation message shown under the input. */
   error?: string | undefined;
   hint?: string;
+  /** Shows "(optional)" next to the label. */
+  optional?: boolean;
 }
 
-export function TextField({ label, error, hint, className = '', dir, ...rest }: TextFieldProps) {
+/** Labelled input. Works with react-hook-form's `register()` (React 19 passes `ref` as a prop). */
+export function TextField({
+  label,
+  error,
+  hint,
+  optional,
+  className = '',
+  ...rest
+}: TextFieldProps) {
   const id = useId();
-  const errorId = `${id}-error`;
-  const hintId = `${id}-hint`;
-  const describedBy = [error ? errorId : null, hint ? hintId : null].filter(Boolean).join(' ');
 
   return (
     <div className={`flex flex-col gap-1.5 ${className}`}>
-      <label htmlFor={id} className="text-sm font-medium text-fg">
-        {label}
-      </label>
+      <FieldLabel htmlFor={id} label={label} optional={optional} />
       <input
         id={id}
-        dir={dir}
         aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy || undefined}
-        className="h-10 rounded-md border border-border-strong bg-surface px-3 text-sm text-fg placeholder:text-fg-muted aria-invalid:border-danger"
+        aria-describedby={fieldDescribedBy(id, error, hint)}
+        className="h-10 rounded-md border border-border-strong bg-surface px-3 text-sm text-fg placeholder:text-fg-muted aria-invalid:border-danger disabled:bg-surface-muted"
         {...rest}
       />
-      {hint && !error ? (
-        <p id={hintId} className="text-xs text-fg-muted">
-          {hint}
-        </p>
-      ) : null}
-      {error ? (
-        <p id={errorId} className="text-xs text-danger">
-          {error}
-        </p>
-      ) : null}
+      <FieldMessages id={id} error={error} hint={hint} />
     </div>
   );
 }

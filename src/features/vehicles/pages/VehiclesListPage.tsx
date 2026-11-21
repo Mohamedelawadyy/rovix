@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { Pagination } from '@/components/shared/Pagination';
 import { SearchInput } from '@/components/shared/SearchInput';
 import { Alert } from '@/components/ui/Alert';
@@ -76,6 +76,14 @@ export function VehiclesListPage() {
             </p>
           ) : null}
         </div>
+        {can('vehicles.create') ? (
+          <Link
+            to="/vehicles/new"
+            className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-on-primary hover:bg-primary-hover"
+          >
+            + {ar.vehicles.form.create}
+          </Link>
+        ) : null}
       </header>
 
       <div className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-4">

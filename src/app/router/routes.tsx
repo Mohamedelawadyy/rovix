@@ -19,10 +19,35 @@ const MODULE_CHILDREN: Partial<Record<string, RouteObject[]>> = {
       }),
     },
     {
+      path: 'new',
+      element: <RequirePermission permission="vehicles.create" />,
+      children: [
+        {
+          index: true,
+          lazy: async () => ({
+            Component: (await import('@/features/vehicles/pages/VehicleFormPages'))
+              .VehicleCreatePage,
+          }),
+        },
+      ],
+    },
+    {
       path: ':vehicleId',
       lazy: async () => ({
         Component: (await import('@/features/vehicles/pages/VehicleDetailPage')).VehicleDetailPage,
       }),
+    },
+    {
+      path: ':vehicleId/edit',
+      element: <RequirePermission permission="vehicles.update" />,
+      children: [
+        {
+          index: true,
+          lazy: async () => ({
+            Component: (await import('@/features/vehicles/pages/VehicleFormPages')).VehicleEditPage,
+          }),
+        },
+      ],
     },
   ],
 };

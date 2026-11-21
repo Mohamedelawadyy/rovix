@@ -1,6 +1,7 @@
 import { api, type Paginated } from '@/lib/api';
 import type { IdName, Vehicle, VehicleBrand, VehicleHistory, VehicleModel } from '../types';
 import type { VehicleListParams } from '../list-params';
+import type { VehiclePayload } from '../vehicle-form-schema';
 
 const LOOKUP_PAGE_SIZE = 100; // backend maximum
 
@@ -19,6 +20,20 @@ export const vehiclesApi = {
   /** GET /vehicles/{id}/history — status changes, transfers, and costs (null without view-cost). */
   history: (id: number, signal?: AbortSignal) =>
     api.get<VehicleHistory>(`/vehicles/${String(id)}/history`, signal ? { signal } : {}),
+
+  /** POST /vehicles (vehicles.create). Stock number is generated when omitted. */
+  create: (payload: VehiclePayload) => api.post<Vehicle>('/vehicles', payload),
+
+  /** PUT /vehicles/{id} (vehicles.update + branch). branch_id/purchase_price/status are prohibited. */
+  update: (id: number, payload: VehiclePayload) =>
+    api.put<Vehicle>(`/vehicles/${String(id)}`, payload),
+
+  /** Active suppliers for the form (needs `suppliers.view`). */
+  suppliers: (signal?: AbortSignal) =>
+    api.get<Paginated<IdName>>('/suppliers', {
+      query: { per_page: LOOKUP_PAGE_SIZE, sort: 'name', filter: { status: 'active' } },
+      ...(signal ? { signal } : {}),
+    }),
 
   /** Active brands for filters (catalog is global, not branch-scoped). */
   brands: (signal?: AbortSignal) =>
@@ -53,4 +68,5 @@ export const vehicleKeys = {
   brands: ['vehicle-catalog', 'brands'] as const,
   models: (brandId: number) => ['vehicle-catalog', 'models', brandId] as const,
   branches: ['branches', 'options'] as const,
+  suppliers: ['suppliers', 'options'] as const,
 };

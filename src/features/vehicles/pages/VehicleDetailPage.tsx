@@ -23,6 +23,7 @@ import {
   vehicleTypeLabels,
 } from '../labels';
 import type { Vehicle } from '../types';
+import { parseVehicleId } from '../vehicle-id';
 
 const t = ar.vehicles.detail;
 const NA = ar.common.notAvailable;
@@ -31,12 +32,8 @@ const money = (value: string | null | undefined) => (value ? formatMoney(value) 
 /** List URL state carried by the list page's links, so "back" restores filters and page. */
 export interface VehicleDetailLinkState {
   listSearch?: string;
-}
-
-function parseId(value: string | undefined): number | null {
-  if (!value || !/^\d+$/.test(value)) return null;
-  const id = Number(value);
-  return id > 0 && Number.isSafeInteger(id) ? id : null;
+  /** One-off confirmation after a save (e.g. "Changes saved"). */
+  notice?: string;
 }
 
 function vehicleName(vehicle: Vehicle): string {
@@ -44,7 +41,7 @@ function vehicleName(vehicle: Vehicle): string {
 }
 
 export function VehicleDetailPage() {
-  const id = parseId(useParams().vehicleId);
+  const id = parseVehicleId(useParams().vehicleId);
   if (id === null) return <NotFoundPage />;
   return <VehicleDetail id={id} />;
 }
@@ -52,7 +49,8 @@ export function VehicleDetailPage() {
 function VehicleDetail({ id }: { id: number }) {
   const { can } = useAuth();
   const location = useLocation();
-  const listSearch = (location.state as VehicleDetailLinkState | null)?.listSearch ?? '';
+  const linkState = location.state as VehicleDetailLinkState | null;
+  const listSearch = linkState?.listSearch ?? '';
 
   const vehicleQuery = useQuery({
     queryKey: vehicleKeys.detail(id),
@@ -158,10 +156,22 @@ function VehicleDetail({ id }: { id: number }) {
             <span className="inline-block">{vehicle.stock_number}</span>
           </p>
         </div>
-        <Badge tone={vehicleStatusTone[vehicle.status]}>
-          {vehicleStatusLabels[vehicle.status]}
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Badge tone={vehicleStatusTone[vehicle.status]}>
+            {vehicleStatusLabels[vehicle.status]}
+          </Badge>
+          {can('vehicles.update') ? (
+            <Link
+              to={`/vehicles/${String(vehicle.id)}/edit`}
+              className="inline-flex h-10 items-center rounded-md border border-border-strong bg-surface px-4 text-sm font-medium text-fg hover:bg-surface-muted"
+            >
+              {ar.vehicles.form.edit}
+            </Link>
+          ) : null}
+        </div>
       </header>
+
+      {linkState?.notice ? <Alert tone="success">{linkState.notice}</Alert> : null}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <VehicleGallery images={vehicle.images} name={vehicleName(vehicle)} />
