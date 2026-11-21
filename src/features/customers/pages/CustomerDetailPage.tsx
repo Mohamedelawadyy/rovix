@@ -130,6 +130,14 @@ function CustomerDetail({ id }: { id: number }) {
           <Badge tone={customerStatusTone[customer.status]}>
             {customerStatusLabels[customer.status]}
           </Badge>
+          {customer.status === 'active' && can('reservations.create') ? (
+            <Link
+              to={`/reservations/new?customer_id=${String(customer.id)}`}
+              className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-on-primary hover:bg-primary-hover"
+            >
+              {ar.reservations.reserveForCustomer}
+            </Link>
+          ) : null}
           {can('customers.update') ? (
             <Link
               to={`/customers/${String(customer.id)}/edit`}

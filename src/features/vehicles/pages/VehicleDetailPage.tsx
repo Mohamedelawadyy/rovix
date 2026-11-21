@@ -167,6 +167,14 @@ function VehicleDetail({ id }: { id: number }) {
           <Badge tone={vehicleStatusTone[vehicle.status]}>
             {vehicleStatusLabels[vehicle.status]}
           </Badge>
+          {vehicle.status === 'available' && can('reservations.create') ? (
+            <Link
+              to={`/reservations/new?vehicle_id=${String(vehicle.id)}`}
+              className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-on-primary hover:bg-primary-hover"
+            >
+              {ar.reservations.reserveVehicle}
+            </Link>
+          ) : null}
           {can('vehicles.update') ? (
             <Link
               to={`/vehicles/${String(vehicle.id)}/edit`}

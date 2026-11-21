@@ -98,6 +98,35 @@ const MODULE_CHILDREN: Partial<Record<string, RouteObject[]>> = {
       ],
     },
   ],
+  reservations: [
+    {
+      index: true,
+      lazy: async () => ({
+        Component: (await import('@/features/reservations/pages/ReservationsListPage'))
+          .ReservationsListPage,
+      }),
+    },
+    {
+      path: 'new',
+      element: <RequirePermission permission="reservations.create" />,
+      children: [
+        {
+          index: true,
+          lazy: async () => ({
+            Component: (await import('@/features/reservations/pages/ReservationCreatePage'))
+              .ReservationCreatePage,
+          }),
+        },
+      ],
+    },
+    {
+      path: ':reservationId',
+      lazy: async () => ({
+        Component: (await import('@/features/reservations/pages/ReservationDetailPage'))
+          .ReservationDetailPage,
+      }),
+    },
+  ],
 };
 
 /** Module routes are generated from NAV_ITEMS and guarded by the module's view permission. */
