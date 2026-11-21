@@ -65,8 +65,8 @@ describe('authentication flow', () => {
     await user.type(screen.getByLabelText('كلمة المرور'), 'password');
     await user.click(screen.getByRole('button', { name: 'دخول' }));
 
-    expect(await screen.findByRole('heading', { name: 'أهلًا، Mohamed Admin' })).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe('/');
+    expect(await screen.findByRole('heading', { name: 'لوحة التحكم' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/dashboard');
     expect(meAuth).toBe('Bearer 1|abc');
     expect(storedSession()).toEqual({ token: '1|abc', expiresAt: '2099-01-01T00:00:00+02:00' });
   });
@@ -85,7 +85,7 @@ describe('authentication flow', () => {
     await user.click(screen.getByRole('button', { name: 'دخول' }));
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe('/');
+      expect(router.state.location.pathname).toBe('/dashboard');
     });
   });
 
@@ -125,7 +125,7 @@ describe('authentication flow', () => {
 
     renderApp({ route: '/', session: { token: 'stored', expiresAt: inSevenDays() } });
 
-    expect(await screen.findByRole('heading', { name: 'أهلًا، Mohamed Admin' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'لوحة التحكم' })).toBeInTheDocument();
   });
 
   it('drops a revoked stored token (401 on /auth/me) and goes to login', async () => {
@@ -158,7 +158,7 @@ describe('authentication flow', () => {
     expect(storedSession()).not.toBeNull();
 
     await user.click(screen.getByRole('button', { name: 'إعادة المحاولة' }));
-    expect(await screen.findByRole('heading', { name: 'أهلًا، Mohamed Admin' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'لوحة التحكم' })).toBeInTheDocument();
   });
 
   it('logs out: revokes the token, clears storage and returns to login', async () => {
@@ -219,7 +219,7 @@ describe('authentication flow', () => {
   it('signs out when another tab signs out', async () => {
     server.use(http.get(`${API}/auth/me`, () => laravel.ok(admin)));
     renderApp({ route: '/', session: { token: 'shared', expiresAt: inSevenDays() } });
-    await screen.findByRole('heading', { name: 'أهلًا، Mohamed Admin' });
+    await screen.findByRole('heading', { name: 'لوحة التحكم' });
 
     localStorage.removeItem(TOKEN_STORAGE_KEY);
     window.dispatchEvent(new StorageEvent('storage', { key: TOKEN_STORAGE_KEY, newValue: null }));
@@ -235,8 +235,8 @@ describe('authentication flow', () => {
       session: { token: 't', expiresAt: inSevenDays() },
     });
 
-    await screen.findByRole('heading', { name: 'أهلًا، Mohamed Admin' });
-    expect(router.state.location.pathname).toBe('/');
+    await screen.findByRole('heading', { name: 'لوحة التحكم' });
+    expect(router.state.location.pathname).toBe('/dashboard');
   });
 });
 

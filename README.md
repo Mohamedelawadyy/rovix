@@ -56,14 +56,28 @@ npm run typecheck && npm run lint && npm run format:check && npm test && npm run
 
 ```text
 src/
-  app/          application shell, config (env validation)
+  app/          config (env), navigation.ts, router/routes.tsx, providers, app-level pages
   assets/brand/ official logo (cropped, never recolored)
   brand/        tokens.css — single source of truth for brand values (+ contrast tests)
-  components/   shared UI (BrandLogo, ...)
-  lib/          framework-free helpers (color contrast, ...)
+  components/   ui/ primitives (Button, TextField, Alert, Icon) and shared/ (BrandLogo, StatusPage)
+  features/     one folder per backend module (auth/ today): api, components, pages, types
+  hooks/        cross-feature hooks (useDocumentTitle)
+  layouts/      app/ shell: sidebar, header, user menu
+  lib/          framework-free helpers: api client, money, color contrast, files
+  locales/      UI strings (ar)
   styles/       global CSS: Cairo font, Tailwind wiring, base styles
-  test/         test setup
+  test/         test setup, MSW server and Laravel response builders, renderApp
 ```
+
+## Navigation and routes
+
+- [`src/app/navigation.ts`](src/app/navigation.ts) lists the modules in scope with the backend
+  permission each needs. The sidebar and the module routes are generated from it.
+- Current scope: Dashboard, Inventory, Customers, Sales contracts, Reservations. Modules render a
+  placeholder until their feature task lands.
+- Users only see modules they can view. Opening one without permission shows 403, and unknown
+  paths show 404 inside the layout. `/` opens the first allowed module.
+- Pages are lazy-loaded (one chunk each). Guards are UX only; the backend authorizes every call.
 
 ## Design tokens and styling
 

@@ -6,6 +6,33 @@ export const ar = {
   common: {
     loading: 'جاري التحميل…',
     retry: 'إعادة المحاولة',
+    reload: 'إعادة تحميل الصفحة',
+    backHome: 'الرجوع للرئيسية',
+  },
+  nav: {
+    label: 'القائمة الرئيسية',
+    open: 'فتح القائمة',
+    close: 'إغلاق القائمة',
+    skipToContent: 'تخطي إلى المحتوى',
+    dashboard: 'لوحة التحكم',
+    vehicles: 'المخزون',
+    customers: 'العملاء',
+    salesContracts: 'عقود البيع',
+    reservations: 'الحجوزات',
+  },
+  layout: {
+    allBranches: 'كل الفروع',
+    underConstruction: 'القسم ده قيد التطوير وهيكون متاح قريبًا.',
+    welcomeTitle: 'أهلًا، {{name}}',
+    noModules: 'مفيش أقسام متاحة لحسابك في النسخة الحالية. تواصل مع مدير النظام لو محتاج صلاحيات.',
+  },
+  pages: {
+    forbiddenTitle: 'غير مسموح',
+    forbiddenBody: 'معندكش صلاحية لفتح الصفحة دي.',
+    notFoundTitle: 'الصفحة غير موجودة',
+    notFoundBody: 'اللينك اللي فتحته مش موجود أو اتنقل.',
+    errorTitle: 'حصلت مشكلة',
+    errorBody: 'حصل خطأ غير متوقع أثناء عرض الصفحة.',
   },
   errors: {
     generic: 'حدث خطأ غير متوقع. حاول مرة أخرى.',
