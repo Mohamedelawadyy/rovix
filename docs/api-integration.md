@@ -46,8 +46,26 @@ Every failure throws `ApiError` (`src/lib/api/errors.ts`):
 
 ## Session
 
-`apiSession` (`src/lib/api/session.ts`) holds the bearer token **in memory** and broadcasts 401s.
-Persistence across reloads is decided and implemented in FE-006 (authentication).
+`apiSession` (`src/lib/api/session.ts`) holds the bearer token the client sends and broadcasts 401s.
+`AuthProvider` (`src/features/auth`) owns the session lifecycle:
+
+- **Storage (decision FE-006):** `localStorage` key `abo-ali.auth.session` holding
+  `{ token, expiresAt }`. It survives reloads and is shared by tabs. Any XSS could read it, so
+  never render untrusted HTML (`dangerouslySetInnerHTML`) and ship a strict CSP in production.
+  Expired, corrupt or blocked storage is treated as signed out.
+- **Boot:** the stored token is adopted synchronously, then `GET /auth/me` verifies it and loads
+  roles, permissions and branches. On 401 → signed out. On network/5xx the session is kept and a
+  retry screen is shown, so a backend hiccup never logs anyone out.
+- **Login:** `POST /auth/login`, then `GET /auth/me` (login has no permissions), then persist.
+- **401 anywhere:** clears storage and the query cache → `/login`.
+- **Logout:** `POST /auth/logout` (best effort), then local clear.
+- **Renewal:** when < 24 h remain, `POST /auth/refresh` under a Web Lock so only one tab
+  renews; other tabs adopt the new token through the `storage` event.
+- **Tabs:** sign-out/sign-in in one tab propagates to the others.
+- **Guards:** `RequireAuth` / `GuestOnly` are UX only; the backend authorizes every request.
+- **Permissions:** `useAuth().can('vehicles.view-cost')` (Super Admin passes everything,
+  mirroring the backend `Gate::before`).
+- **Password reset:** the backend emails `/reset-password?token=…&email=…` (route is public).
 
 ## Money
 

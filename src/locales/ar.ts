@@ -1,0 +1,58 @@
+/**
+ * Arabic UI strings (default locale). Structured as an i18n resource so it can be handed to
+ * i18next unchanged when English support lands.
+ */
+export const ar = {
+  common: {
+    loading: 'جاري التحميل…',
+    retry: 'إعادة المحاولة',
+  },
+  errors: {
+    generic: 'حدث خطأ غير متوقع. حاول مرة أخرى.',
+    network: 'تعذر الاتصال بالخادم. تحقق من الاتصال وحاول مرة أخرى.',
+    server: 'حدث خطأ في الخادم. حاول مرة أخرى لاحقًا.',
+    rateLimited: 'محاولات كثيرة. انتظر قليلًا ثم حاول مرة أخرى.',
+    sessionUnavailable: 'تعذر التحقق من الجلسة.',
+  },
+  auth: {
+    email: 'البريد الإلكتروني',
+    password: 'كلمة المرور',
+    passwordConfirmation: 'تأكيد كلمة المرور',
+    passwordHint: '٨ أحرف على الأقل، وتحتوي على حروف وأرقام.',
+    login: {
+      title: 'تسجيل الدخول',
+      subtitle: 'ادخل ببيانات حسابك للمتابعة',
+      submit: 'دخول',
+      submitting: 'جاري الدخول…',
+      forgot: 'نسيت كلمة المرور؟',
+    },
+    forgot: {
+      title: 'استعادة كلمة المرور',
+      subtitle: 'هنبعت لك لينك لتعيين كلمة مرور جديدة',
+      submit: 'إرسال اللينك',
+      submitting: 'جاري الإرسال…',
+      sent: 'لو البريد مسجل عندنا، هيوصلك لينك إعادة تعيين كلمة المرور خلال دقائق.',
+      backToLogin: 'الرجوع لتسجيل الدخول',
+    },
+    reset: {
+      title: 'تعيين كلمة مرور جديدة',
+      submit: 'حفظ كلمة المرور',
+      submitting: 'جاري الحفظ…',
+      invalidLink: 'لينك إعادة التعيين غير صالح أو ناقص. اطلب لينك جديد.',
+      requestNewLink: 'طلب لينك جديد',
+      done: 'تم تغيير كلمة المرور. سجّل دخولك بكلمة المرور الجديدة.',
+    },
+    home: {
+      welcome: 'أهلًا، {{name}}',
+      logout: 'تسجيل الخروج',
+      loggingOut: 'جاري الخروج…',
+    },
+  },
+} as const;
+
+/** Replaces `{{key}}` placeholders. */
+export function interpolate(template: string, params: Record<string, string | number>): string {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, key: string) =>
+    key in params ? String(params[key]) : match,
+  );
+}
