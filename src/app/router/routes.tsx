@@ -11,16 +11,25 @@ import { AppLayout } from '@/layouts/app/AppLayout';
  * loaded (one chunk per module). Until a module is built it renders a placeholder; FE-008+
  * replace the lazy import with the real feature page.
  */
+/** Built module list pages, keyed by NAV_ITEMS key. Others show the placeholder. */
+const MODULE_PAGES: Partial<Record<string, RouteObject['lazy']>> = {
+  vehicles: async () => ({
+    Component: (await import('@/features/vehicles/pages/VehiclesListPage')).VehiclesListPage,
+  }),
+};
+
 const moduleRoutes: RouteObject[] = NAV_ITEMS.map((item) => ({
   path: item.to,
   element: <RequirePermission permission={item.permission} />,
   children: [
     {
       index: true,
-      lazy: async () => {
-        const { ModulePlaceholderPage } = await import('@/app/pages/ModulePlaceholderPage');
-        return { element: <ModulePlaceholderPage title={item.label} /> };
-      },
+      lazy:
+        MODULE_PAGES[item.key] ??
+        (async () => {
+          const { ModulePlaceholderPage } = await import('@/app/pages/ModulePlaceholderPage');
+          return { element: <ModulePlaceholderPage title={item.label} /> };
+        }),
     },
   ],
 }));
