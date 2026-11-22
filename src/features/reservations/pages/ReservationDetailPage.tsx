@@ -171,6 +171,17 @@ function ReservationDetail({ id }: { id: number }) {
             {reservationStatusLabels[reservation.status]}
           </Badge>
           {isOverdue(reservation) ? <Badge tone="warning">{ar.reservations.overdue}</Badge> : null}
+          {reservation.status === 'active' &&
+          vehicle &&
+          customer &&
+          can('sales-contracts.create') ? (
+            <Link
+              to={`/sales-contracts/new?vehicle_id=${String(vehicle.id)}&customer_id=${String(customer.id)}`}
+              className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-on-primary hover:bg-primary-hover"
+            >
+              {ar.salesContracts.convertReservation}
+            </Link>
+          ) : null}
           {canRelease ? (
             <Button
               variant="danger"

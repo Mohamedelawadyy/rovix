@@ -35,7 +35,8 @@ export function EntityPicker<T>({
   error?: string | undefined;
   searchPlaceholder: string;
   selected: PickerOption | null;
-  onSelect: (option: PickerOption | null) => void;
+  /** `item` is the full record when picked from the results (not when cleared). */
+  onSelect: (option: PickerOption | null, item?: T) => void;
   queryKey: (search: string) => QueryKey;
   queryFn: (search: string, signal: AbortSignal) => Promise<Paginated<T>>;
   toOption: (item: T) => PickerOption;
@@ -66,7 +67,7 @@ export function EntityPicker<T>({
     .filter(Boolean)
     .join(' ');
   const data = query.data;
-  const options = data?.items.map(toOption) ?? [];
+  const options = (data?.items ?? []).map((item) => ({ option: toOption(item), item }));
 
   return (
     <fieldset
@@ -132,14 +133,14 @@ export function EntityPicker<T>({
               aria-busy={query.isFetching}
               className="max-h-64 divide-y divide-border overflow-y-auto rounded-md border border-border"
             >
-              {options.map((option) => (
+              {options.map(({ option, item }) => (
                 <li key={option.id}>
                   <button
                     type="button"
                     className="flex w-full flex-col items-start px-3 py-2 text-start hover:bg-surface-muted focus-visible:bg-surface-muted"
                     onClick={() => {
                       focusNext.current = true;
-                      onSelect(option);
+                      onSelect(option, item);
                     }}
                   >
                     <span className="text-sm font-medium text-fg">{option.title}</span>

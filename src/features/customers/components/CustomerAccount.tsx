@@ -4,6 +4,8 @@ import { Card, DetailList } from '@/components/shared/DetailList';
 import { Pagination } from '@/components/shared/Pagination';
 import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
+import { useAuth } from '@/features/auth/auth-context';
+import { Link } from 'react-router';
 import { getErrorMessage } from '@/lib/api/error-message';
 import { formatDate, formatNumber } from '@/lib/format';
 import { formatMoney } from '@/lib/money/money';
@@ -90,6 +92,7 @@ export function CustomerBalanceCard({ customerId }: { customerId: number }) {
 }
 
 export function CustomerContractsCard({ customerId }: { customerId: number }) {
+  const canOpenContracts = useAuth().can('sales-contracts.view');
   const [page, setPage] = useState(1);
   const query = useQuery({
     queryKey: customerKeys.contracts(customerId, page),
@@ -138,7 +141,16 @@ export function CustomerContractsCard({ customerId }: { customerId: number }) {
                 {data.items.map((contract) => (
                   <tr key={contract.id}>
                     <td className={`${td} font-medium`} dir="ltr">
-                      {contract.number}
+                      {canOpenContracts ? (
+                        <Link
+                          to={`/sales-contracts/${String(contract.id)}`}
+                          className="text-accent hover:underline"
+                        >
+                          {contract.number}
+                        </Link>
+                      ) : (
+                        contract.number
+                      )}
                     </td>
                     <td className={td}>
                       {contract.vehicle

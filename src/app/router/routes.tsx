@@ -98,6 +98,35 @@ const MODULE_CHILDREN: Partial<Record<string, RouteObject[]>> = {
       ],
     },
   ],
+  'sales-contracts': [
+    {
+      index: true,
+      lazy: async () => ({
+        Component: (await import('@/features/sales-contracts/pages/ContractsListPage'))
+          .ContractsListPage,
+      }),
+    },
+    {
+      path: 'new',
+      element: <RequirePermission permission="sales-contracts.create" />,
+      children: [
+        {
+          index: true,
+          lazy: async () => ({
+            Component: (await import('@/features/sales-contracts/pages/ContractCreatePage'))
+              .ContractCreatePage,
+          }),
+        },
+      ],
+    },
+    {
+      path: ':contractId',
+      lazy: async () => ({
+        Component: (await import('@/features/sales-contracts/pages/ContractDetailPage'))
+          .ContractDetailPage,
+      }),
+    },
+  ],
   reservations: [
     {
       index: true,
