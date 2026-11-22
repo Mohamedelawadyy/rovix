@@ -11,6 +11,14 @@ import { AppLayout } from '@/layouts/app/AppLayout';
  * Every page is lazy-loaded. Modules not listed here render a placeholder.
  */
 const MODULE_CHILDREN: Partial<Record<string, RouteObject[]>> = {
+  dashboard: [
+    {
+      index: true,
+      lazy: async () => ({
+        Component: (await import('@/features/dashboard/DashboardPage')).DashboardPage,
+      }),
+    },
+  ],
   vehicles: [
     {
       index: true,
